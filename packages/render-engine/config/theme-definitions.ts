@@ -383,7 +383,7 @@ export const alexandrosTheme: ThemeDefinition = {
     'gradient-grid': {
       backgroundImage:
         "linear-gradient(to bottom right, #fef9f0, #fff3e0), " +
-        "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='5' y='5' width='12' height='12' fill='%23ff9f1c' opacity='0.12' rx='1'/%3E%3Cpolygon points='43,2 50,15 36,15' fill='%232563eb' opacity='0.10'/%3E%3C/svg%3E\")",
+        "url(\"data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='5' y='5' width='12' height='12' fill='%23ff9f1c' opacity='0.12' rx='1'/%3E%3Crect x='35' y='35' width='12' height='12' fill='%23ff9f1c' opacity='0.10' rx='1' transform='rotate(45 41 41)'/%3E%3Cpolygon points='43,2 50,15 36,15' fill='%232563eb' opacity='0.10'/%3E%3C/svg%3E\")",
       backgroundSize: '100%, 60px 60px',
     },
     solid: { backgroundColor: '#fef9f0' },
