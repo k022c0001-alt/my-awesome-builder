@@ -87,14 +87,16 @@ const CardIcon: React.FC<{ icon: string }> = ({ icon }) => {
   }
 
   if (isSvg) {
+    // Encode SVG as a data URL for use in <img> so scripts inside the SVG
+    // cannot execute (SVG loaded via <img> is sandboxed by the browser).
+    const svgDataUrl = `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(icon)))}`;
     return (
       <div
         className="flex items-center justify-center w-12 h-12 rounded-xl mb-4"
-        style={{ backgroundColor: 'rgba(var(--color-primary-rgb,37,99,235),0.1)', color: 'var(--color-primary)' }}
-        // SVG strings are static content authored by site builders, not user input
-        // eslint-disable-next-line react/no-danger
-        dangerouslySetInnerHTML={{ __html: icon }}
-      />
+        style={{ backgroundColor: 'rgba(var(--color-primary-rgb,37,99,235),0.1)' }}
+      >
+        <img src={svgDataUrl} alt="" className="w-7 h-7 object-contain" aria-hidden="true" />
+      </div>
     );
   }
 

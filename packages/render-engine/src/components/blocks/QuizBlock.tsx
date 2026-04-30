@@ -271,11 +271,11 @@ const InstantCheckQuiz: React.FC<{
   const [checked, setChecked] = useState(false);
   const id = useId();
 
-  const normalise = (s: string) => s.trim().toLowerCase();
+  const normalize = (s: string) => s.trim().toLowerCase();
   const isCorrect =
     checked &&
     question.answer != null &&
-    normalise(value) === normalise(question.answer);
+    normalize(value) === normalize(question.answer);
 
   const handleCheck = () => { if (value.trim()) setChecked(true); };
   const handleReset = () => { setValue(''); setChecked(false); };
