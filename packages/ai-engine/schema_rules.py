@@ -56,6 +56,56 @@ BLOCK_TYPES: frozenset[str] = frozenset(BLOCK_LIBRARY.keys())
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Surface system — 8 surface types for visual texture
+# ─────────────────────────────────────────────────────────────────────────────
+
+SURFACE_TYPES: list[str] = [
+    "flat",
+    "glass",
+    "neumorphism",
+    "bordered",
+    "elevated",
+    "paper",
+    "glow",
+    "frosted-dark",
+]
+
+# Default surface recommendations per block type
+BLOCK_SURFACE_DEFAULTS: dict[str, str] = {
+    "hero":              "glass",
+    "split_hero":        "elevated",
+    "section_header":    "flat",
+    "anchor_nav":        "flat",
+    "sidebar_index":     "flat",
+    "two_column_layout": "flat",
+    "footer":            "flat",
+    "info_cards":        "elevated",
+    "profile_cards":     "elevated",
+    "timeline":          "paper",
+    "step_flow":         "elevated",
+    "table_section":     "bordered",
+    "definition_box":    "paper",
+    "quote_panel":       "paper",
+    "code_panel":        "bordered",
+    "diagram_cards":     "flat",
+    "accordion_faq":     "flat",
+    "checklist_summary": "bordered",
+    "image_gallery":     "flat",
+    "feature_banner":    "glow",
+    "progress_meter":    "flat",
+    "statistic_circle":  "neumorphism",
+    "comparison_split":  "elevated",
+    "spotlight_panel":   "glass",
+    "quiz":              "neumorphism",
+    "mini_test":         "bordered",
+    "download_cta":      "glow",
+    "next_lesson":       "elevated",
+    "contact_box":       "glass",
+    "final_message":     "flat",
+}
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # Page-level configuration schema
 # ─────────────────────────────────────────────────────────────────────────────
 
@@ -95,14 +145,16 @@ class SchemaValidationError(ValueError):
     """Raised when a generated schema violates the block or page rules."""
 
 
-def validate_block(block_type: str, variant: str) -> None:
+def validate_block(block_type: str, variant: str, surface: str | None = None) -> None:
     """
-    Validate that *block_type* exists and *variant* is one of its allowed values.
+    Validate that *block_type* exists, *variant* is one of its allowed values,
+    and (optionally) *surface* is a recognised surface type.
 
     Raises
     ------
     SchemaValidationError
-        If the block type is unknown or the variant is not supported.
+        If the block type is unknown, the variant is not supported, or the
+        surface is not a valid SURFACE_TYPES entry.
     """
     if block_type not in BLOCK_LIBRARY:
         known = ", ".join(sorted(BLOCK_LIBRARY))
@@ -116,6 +168,12 @@ def validate_block(block_type: str, variant: str) -> None:
         raise SchemaValidationError(
             f"Invalid variant '{variant}' for block '{block_type}'. "
             f"Allowed variants: {', '.join(allowed_variants)}"
+        )
+
+    if surface is not None and surface not in SURFACE_TYPES:
+        raise SchemaValidationError(
+            f"Invalid surface '{surface}' for block '{block_type}'. "
+            f"Allowed surfaces: {', '.join(SURFACE_TYPES)}"
         )
 
 
@@ -212,9 +270,10 @@ def validate_page_schema(schema: dict) -> list[str]:
 
         block_type = block.get("type", "")
         variant    = block.get("variant", "")
+        surface    = block.get("surface")
 
         try:
-            validate_block(block_type, variant)
+            validate_block(block_type, variant, surface)
         except SchemaValidationError as exc:
             errors.append(f"[blocks[{i}]] {exc}")
 
@@ -232,8 +291,19 @@ def get_block_library_prompt_fragment() -> str:
     """
     lines = ["Available blocks and their variants:"]
     for block_type, variants in BLOCK_LIBRARY.items():
-        lines.append(f"  - {block_type}: {', '.join(variants)}")
+        default_surface = BLOCK_SURFACE_DEFAULTS.get(block_type, "flat")
+        lines.append(f"  - {block_type}: {', '.join(variants)} (default surface: {default_surface})")
     return "\n".join(lines)
+
+
+def get_surface_types_prompt_fragment() -> str:
+    """
+    Returns surface type options for AI prompts.
+    """
+    return (
+        "Surface types (optional per-block 'surface' field):\n"
+        f"  {' | '.join(SURFACE_TYPES)}"
+    )
 
 
 def get_page_config_prompt_fragment() -> str:
