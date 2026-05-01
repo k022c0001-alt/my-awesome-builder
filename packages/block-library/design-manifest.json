@@ -1,0 +1,32 @@
+{
+  "surfaces": [
+    /* Define all surfaces here */
+    "surface1",
+    "surface2"
+  ],
+  "themes": [
+    /* Define all themes here */
+    "theme1",
+    "theme2"
+  ],
+  "blocks": [
+    /* Define all blocks here */
+    "block1",
+    "block2"
+  ],
+  "pageConfiguration": {
+    /* Define page configuration here */
+    "setting1": "value1",
+    "setting2": "value2"
+  },
+  "designTokens": {
+    /* Define design tokens here */
+    "token1": "value1",
+    "token2": "value2"
+  },
+  "validationRules": {
+    /* Define validation rules here */
+    "rule1": "value1",
+    "rule2": "value2"
+  }
+}
