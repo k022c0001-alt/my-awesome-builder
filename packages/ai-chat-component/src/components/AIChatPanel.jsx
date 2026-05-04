@@ -9,6 +9,11 @@
  *  - Maintains conversation history for multi-turn context
  *  - Displays which API answered (SQL API / CSS API)
  *
+ * Console log legend:
+ *  🔵  Front-end send / receive
+ *  🟡  Language detection
+ *  🔴  Errors / warnings
+ *
  * Usage:
  * ```jsx
  * import { AIChatPanel } from '@my-awesome-builder/ai-chat-component';
@@ -84,6 +89,21 @@ function AIChatPanel({
     const text = inputText.trim();
     if (!text || isLoading) return;
 
+    const sendTimestamp = new Date().toISOString();
+    const { intent: routeIntent, language: routeLang, confidence: routeConf } = previewRoute(text);
+
+    // ── 1️⃣ Front-end: user sends message ─────────────────────────────────
+    console.info(
+      '%c🔵 [フロント - 1️⃣] ユーザーが質問を送信',
+      'color: #3b82f6; font-weight: bold',
+    );
+    console.info('   📝 Message          :', text);
+    console.info('   🌍 Detected Language:', routeLang);
+    console.info('   📊 Confidence       :', `${(routeConf * 100).toFixed(0)}%`);
+    console.info('   🛣️  Route Intent     :', routeIntent);
+    console.info('   ⏱️  Timestamp        :', sendTimestamp);
+    console.info('   📜 History turns    :', chatHistory.length);
+
     setInputText('');
     resetLang();
     addUserMessage(text);
@@ -91,9 +111,29 @@ function AIChatPanel({
 
     try {
       const result = await send(text, chatHistory);
+      const receiveTimestamp = new Date().toISOString();
+      const totalMs = Date.now() - new Date(sendTimestamp).getTime();
+
+      // ── 5️⃣ Front-end: response received ──────────────────────────────
+      console.info(
+        '%c🔵 [フロント - 5️⃣] レスポンス受信',
+        'color: #3b82f6; font-weight: bold',
+      );
+      console.info('   ✅ Status           : 200 OK');
+      console.info('   📦 Response Type    :', result.source ?? result.intent);
+      console.info('   🌍 Language         :', result.language ?? routeLang);
+      console.info('   💬 Reply            :', result.reply?.slice(0, 120));
+      console.info('   ⏱️  Total time       :', `${totalMs}ms`);
+      console.info('   🕐 Received at      :', receiveTimestamp);
+
       addAIMessage(result.reply, result.source);
+      console.info('   ✅ メッセージ追加完了');
     } catch (error) {
-      console.error('[AIChatPanel] send error:', error);
+      console.error(
+        '%c🔴 [フロント] エラー発生',
+        'color: #ef4444; font-weight: bold',
+        error,
+      );
       addErrorMessage('エラーが発生しました。もう一度お試しください。');
     }
   };
