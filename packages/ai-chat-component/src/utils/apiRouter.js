@@ -3,6 +3,10 @@
  * ============
  * Routes chat messages to the appropriate API endpoint based on
  * the content of the user's message (SQL vs CSS/styling).
+ *
+ * Console log legend:
+ *  🟡  Routing decision
+ *  🔴  Errors / warnings
  */
 
 import API_ENDPOINTS from '../config/apiEndpoints.js';
@@ -97,13 +101,25 @@ export function resolveRoute(message) {
  * @returns {Promise<{ reply: string, source: string, intent: string, language: string }>}
  */
 export async function sendMessage({ message, history = [], dbPath = '', endpointOverrides = {} }) {
-  const { intent, endpoint: defaultEndpoint, language } = resolveRoute(message);
+  const { intent, endpoint: defaultEndpoint, language, confidence } = resolveRoute(message);
 
   const endpoint = endpointOverrides[intent] ?? defaultEndpoint;
 
   // Select auth header based on routing intent
   const authProvider = intent === ROUTE_INTENT.SQL ? 'SQL_API' : 'CSS_API';
   const authHeader = getAuthHeader(authProvider);
+
+  // ── 🟡 Routing decision log ────────────────────────────────────────────
+  console.info(
+    '%c🟡 [処理 - 3️⃣] 言語検出＆ルーティング',
+    'color: #eab308; font-weight: bold',
+  );
+  console.info('   🔍 Language Detection:', language, `(confidence: ${(confidence * 100).toFixed(0)}%)`);
+  console.info('   🛣️  Routing to        :', `${intent} API`);
+  console.info('   📡 Endpoint          :', endpoint);
+  console.info('   📐 Processing Mode   :', 'auto');
+
+  const requestStart = Date.now();
 
   const body = {
     message,
@@ -126,18 +142,38 @@ export async function sendMessage({ message, history = [], dbPath = '', endpoint
     body: JSON.stringify(body),
   });
 
+  const requestMs = Date.now() - requestStart;
+
   if (!response.ok) {
     const errorText = await response.text().catch(() => response.statusText);
+    console.warn(
+      '%c🔴 [APIRouter] リクエスト失敗',
+      'color: #ef4444; font-weight: bold',
+      { status: response.status, body: errorText },
+    );
     throw new Error(`API error (${response.status}): ${errorText}`);
   }
 
   const data = await response.json();
 
+  // ── 🟢 Response log ────────────────────────────────────────────────────
+  console.info(
+    '%c🟢 [バックエンド - 4️⃣] レスポンス生成',
+    'color: #22c55e; font-weight: bold',
+  );
+  console.info('   📤 Type             :', data.source ?? intent);
+  console.info('   🌍 Language         :', data.language ?? language);
+  console.info('   💬 Reply generated  :', data.reply?.slice(0, 80));
+  console.info('   ⏱️  Request time     :', `${requestMs}ms`);
+  if (data.processing_ms != null) {
+    console.info('   ⏱️  Server proc. time:', `${data.processing_ms}ms`);
+  }
+
   return {
     reply: data.reply ?? data.message ?? data.content ?? '',
     source: data.source ?? intent,
     intent,
-    language,
+    language: data.language ?? language,
   };
 }
 
