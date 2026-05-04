@@ -74,7 +74,7 @@ JSON → フロント
 🟡 [処理 - 3️⃣] 言語検出＆ルーティング
    🔍 Language Detection: tailwind  (confidence: 95%)
    🛣️  Routing to        : css API
-   📡 Endpoint          : http://127.0.0.1:8766/api/chat
+   📡 Endpoint          : http://127.0.0.1:8765/api/chat
    📐 Processing Mode   : auto
 
 🟢 [バックエンド - 4️⃣] レスポンス生成
@@ -103,8 +103,6 @@ JSON → フロント
    📊 Message    : 'Tailwindでボタンスタイルを作りたい'
    📊 Mode       : auto
    📊 History    : 0 turns
-   🔑 API Key    : sk_tailwxxxxx
-   ✅ API Key Validated
 
 🟡 [処理 - 3️⃣] 言語検出＆ルーティング
    🆔 Request ID    : a1b2c3d4

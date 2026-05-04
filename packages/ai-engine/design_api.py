@@ -162,11 +162,6 @@ def chat():
     print(f"   📊 Message    : {message!r}")
     print(f"   📊 Mode       : {mode}")
     print(f"   📊 History    : {len(history)} turns")
-    if api_key:
-        print(f"   🔑 API Key    : [provided]")
-        print(f"   ✅ API Key Validated")
-    else:
-        print(f"   ⚠️  API Key    : (none)")
 
     if not message:
         print(f"🔴 [バックエンド] message フィールドが必要です (req={request_id})")
@@ -194,7 +189,7 @@ def chat():
     print(f"   🆔 Request ID      : {request_id}")
     print(f"   📤 Type            : {api_type}")
     print(f"   🌍 Language        : {language}")
-    print(f"   💬 Reply generated : {reply[:80]!r}{'...' if len(reply) > 80 else ''}")
+    print(f"   💬 Reply generated : {_truncate(reply, 80)!r}")
     print(f"   ⏱️  Processing time : {processing_ms}ms")
 
     response_body = {
